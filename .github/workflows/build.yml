@@ -57,7 +57,7 @@ jobs:
           git am '${{ github.workspace }}/patches/0001-cmake-Use-qtpaths-instead-of-qmake.patch'
 
       - name: Configure
-        run: cmake -B GammaRay\build -G "${{ matrix.system }}" -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/GammaRay/install" -DCMAKE_PREFIX_PATH:PATH="${{ github.workspace }}/qt" -DCMAKE_BUILD_TYPE:STRING=${{ matrix.config }} -DGAMMARAY_USE_PCH=ON GammaRay
+        run: cmake -B GammaRay\build -G "${{ matrix.system }}" -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/GammaRay/install" -DCMAKE_PREFIX_PATH:PATH="${{ github.workspace }}/qt" -DCMAKE_BUILD_TYPE:STRING=${{ matrix.config }} -DGAMMARAY_USE_PCH=${{ matrix.system == 'Ninja' && 'ON' || 'OFF' }} GammaRay
      
       - name: Build
         run: cmake --build GammaRay\build --target install --config ${{ matrix.config }} --parallel
