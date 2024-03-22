@@ -1,0 +1,27 @@
+From f63f94f0e3101c5c86a73ee47da8a8bb102e85e2 Mon Sep 17 00:00:00 2001
+From: derrod <dennis@obsproject.com>
+Date: Fri, 22 Mar 2024 22:56:38 +0100
+Subject: [PATCH] cmake: Use qtpaths instead of qmake
+
+---
+ cmake/KDAB/modules/KDQtInstallPaths.cmake | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/KDAB/modules/KDQtInstallPaths.cmake b/cmake/KDAB/modules/KDQtInstallPaths.cmake
+index 4fa7d04b9..ec1729497 100644
+--- a/cmake/KDAB/modules/KDQtInstallPaths.cmake
++++ b/cmake/KDAB/modules/KDQtInstallPaths.cmake
+@@ -16,8 +16,8 @@ if(NOT DEFINED QT_VERSION_MAJOR)
+     message(FATAL_ERROR "Please set QT_VERSION_MAJOR first (ie. set(QT_VERSION_MAJOR 5))")
+ endif()
+ 
+-if(TARGET Qt${QT_VERSION_MAJOR}::qmake)
+-    get_target_property(QT_QMAKE_EXECUTABLE Qt${QT_VERSION_MAJOR}::qmake LOCATION)
++if(TARGET Qt${QT_VERSION_MAJOR}::qtpaths)
++    get_target_property(QT_QMAKE_EXECUTABLE Qt${QT_VERSION_MAJOR}::qtpaths LOCATION)
+ else()
+     message(FATAL_ERROR "No supported Qt version found. Make sure you find Qt before calling this")
+ endif()
+-- 
+2.39.1.windows.1
+
