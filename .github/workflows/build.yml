@@ -1,0 +1,61 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 17 0 * * *
+
+jobs:
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        config: [Release, Debug]
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Fetch GammaRay repo
+        run: git clone https://github.com/KDAB/GammaRay
+      
+      - name: Fetch obs-deps Qt Release build
+        if: matrix.config == 'Release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download -R obsproject/obs-deps -p "windows-deps-qt6-*-x64.zip"
+
+      - name: Fetch obs-deps Qt Debug build
+        if: matrix.config == 'Debug'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download -R obsproject/obs-deps -p "windows-deps-qt6-*-x64-Debug.zip"
+
+      - name: Extract Qt build
+        run: Expand-Archive -Path "windows-deps-qt*.zip" -DestinationPath qt
+
+      - name: Apply Patch
+        env:
+          GIT_COMMITTER_NAME: 'buildbot'
+          GIT_COMMITTER_EMAIL: 'buildbot@obsproject.com'
+        run: |
+          cd GammaRay
+          git am '${{ github.workspace }}/patches/0001-cmake-Use-qtpaths-instead-of-qmake.patch'
+
+      - name: Configure
+        run: cmake -B GammaRay\build -G "Visual Studio 17 2022" -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/GammaRay/install" -DCMAKE_PREFIX_PATH:PATH="${{ github.workspace }}/qt" GammaRay
+     
+      - name: Build
+        run: cmake --build GammaRay\build --target install --config ${{ matrix.config }} --parallel
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+            name: 'GammaRay-${{ matrix.config }}'
+            path: '${{ github.workspace }}/GammaRay/install'
+            compression-level: 9
