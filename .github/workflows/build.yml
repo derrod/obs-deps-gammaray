@@ -17,11 +17,6 @@ jobs:
       run:
         shell: pwsh
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
-
       - name: Install Ninja
         if: matrix.system == 'Ninja'
         uses: turtlesec-no/get-ninja@main
@@ -47,14 +42,6 @@ jobs:
 
       - name: Extract Qt build
         run: Expand-Archive -Path "windows-deps-qt*.zip" -DestinationPath qt
-
-      - name: Apply Patch
-        env:
-          GIT_COMMITTER_NAME: 'buildbot'
-          GIT_COMMITTER_EMAIL: 'buildbot@obsproject.com'
-        run: |
-          cd GammaRay
-          git am '${{ github.workspace }}/patches/0001-cmake-Use-qtpaths-instead-of-qmake.patch'
 
       - name: Configure
         run: cmake -B GammaRay\build -G "${{ matrix.system }}" -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/GammaRay/install" -DCMAKE_PREFIX_PATH:PATH="${{ github.workspace }}/qt" -DCMAKE_BUILD_TYPE:STRING=${{ matrix.config }} -DGAMMARAY_USE_PCH=${{ matrix.system == 'Ninja' && 'ON' || 'OFF' }} GammaRay
