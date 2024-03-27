@@ -10,9 +10,10 @@ jobs:
     name: Windows
     runs-on: windows-latest
     strategy:
+      fail-fast: false
       matrix:
         system: ['Ninja', 'Visual Studio 17 2022']
-        config: [Release, Debug]
+        config: [Release, RelWithDebInfo, Debug]
     defaults:
       run:
         shell: pwsh
