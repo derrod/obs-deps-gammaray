@@ -29,17 +29,10 @@ jobs:
       - name: Fetch GammaRay repo
         run: git clone https://github.com/KDAB/GammaRay
       
-      - name: Fetch obs-deps Qt Release build
-        if: matrix.config == 'Release'
+      - name: Fetch obs-deps Qt build
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release download -R obsproject/obs-deps -p "windows-deps-qt6-*-x64.zip"
-
-      - name: Fetch obs-deps Qt Debug build
-        if: matrix.config == 'Debug'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh release download -R obsproject/obs-deps -p "windows-deps-qt6-*-x64-Debug.zip"
 
       - name: Extract Qt build
         run: Expand-Archive -Path "windows-deps-qt*.zip" -DestinationPath qt
